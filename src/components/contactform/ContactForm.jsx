@@ -1,9 +1,8 @@
-import css from './ContactForm.module.css'
-import { nanoid } from 'nanoid';
+import css from './ContactForm.module.css';
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import {addContact} from "../../redux/contactsSlice";
+import {addContact} from "../../redux/contactsOps";
 
 export default function ContactForm () {
     const dispatch = useDispatch();
@@ -19,14 +18,15 @@ export default function ContactForm () {
         if (isExist) {
         alert('This contact already exists!');
         actions.resetForm();
-        return; }
+        return; 
+       }
         dispatch(addContact({
-            id: nanoid(),
             name: values.name,
             number: values.number,
           }));
           actions.resetForm();
         };
+        
         return (
             <Formik initialValues={{name:"", number:""}} onSubmit={handleSubmit} validationSchema={contactSchema}>
                 <Form className={css.form}>

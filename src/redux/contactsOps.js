@@ -1,27 +1,37 @@
 import axios from "axios";
-import toast, { Toaster } from 'react-hot-toast';
-import { fetchInProgress, fetchError, addContact, deleteContact, } from "./contactsSlice";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import toast from 'react-hot-toast';
 
 axios.defaults.baseURL = "https://681386c2129f6313e2118f2d.mockapi.io";
 
-const fetchContacts = () => async dispatch => {
+export const fetchContacts =  createAsyncThunk ("contacts/fetchAll", async (_, thunkAPI) => {
     try {
-        dispatch(fetchInProgress());
-        const response = await axios.get("/contacts/fetchAll")
+        const response = await axios.get("/contacts");
         return response.data;
     }
     catch (error) {
-        toast.error("This didn't work.");
-        dispatch(fetchError(error.message));
+        toast.error("Failed to fetch contacts.");
+        return thunkAPI.rejectWithValue(error.message);
     }
-};
+});
 
-const addContact = () => asyns dispatch => {
-    const response = await axios.post ("contacts/addContact")
-    return response.data.result
-};
+export const addContact = createAsyncThunk("contacts/addContact", async (newContact, thunkAPI) => {
+    try {
+        const response = await axios.post ("/contacts", newContact)
+        return response.data;
+    } catch (error) {
+        toast.error("Failed to add contact.");
+        return thunkAPI.rejectWithValue(error.message);
+    }
+   
+});
 
-const deleteContact = () =>  asyns dispatch => {
-    const response = await axios.delete ("contacts/deleteContact")
-    return response.data.result
-}
+export const deleteContact = createAsyncThunk("contacts/deleteContact", async (contactId, thunkAPI) => {
+    try {
+        await axios.delete (`/contacts/${contactId}`);
+        return contactId
+    } catch (error){
+        toast.error("Failed to delete contact.");
+        return thunkAPI.rejectWithValue(error.message);
+    }
+});
